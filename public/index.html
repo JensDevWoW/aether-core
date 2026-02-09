@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Aether Core Client</title>
+    <link rel="stylesheet" href="style.css">
     <style>
         body { background-color: #111; color: #0f0; font-family: monospace; padding: 20px; }
         #log { border: 1px solid #333; height: 300px; overflow-y: scroll; padding: 10px; background: #000;}
@@ -9,21 +10,127 @@
 </head>
 <body>
     <h1>Aether Core v0.1</h1>
-    <div id="log"></div>
     <br>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    
+    <div id="ui-layer">
+        <div id="screen-login">
+            <h2>AETHER CORE</h2>
+            <input type="text" id="username" placeholder="Username...">
+            <input type="password" id="password" placeholder="Password...">
+            <button id="login-btn">Enter World</button>
+        </div>
+
+        <div id="screen-char-select" style="display:none;">
+            <h3>Select your Hero</h3>
+            <div id="char-list">
+                <div class="char-card" onclick="selectChar('Warrior')">WARRIOR - Lvl 10</div>
+                <div class="char-card" onclick="selectChar('Mage')">MAGE - Lvl 12</div>
+            </div>
+        </div>
+
+        <div id="game-hud" style="display:none;">
+    
+            <div id="target-panel">
+                <h3>Select Target:</h3>
+                <button class="target-btn" data-id="target-dummy-1">Dummy 1</button>
+                <button class="target-btn" data-id="target-dummy-2">Dummy 2</button>
+                <div id="current-target-display">Target: None</div>
+            </div>
+
+            <div id="cast-bar-container">
+                <div id="cast-bar-fill"></div>
+                <div id="cast-text">Casting...</div>
+            </div>
+
+            <div id="action-bar">
+                <button class="spell-btn" onclick="castSpell(101)">1. Fireball</button>
+                <button class="spell-btn" onclick="castSpell(102)">2. Frostbolt</button>
+                <button class="spell-btn" onclick="castSpell(103)">3. Heal</button>
+            </div>
+
+            <div id="combat-log">
+                <div class="log-entry system">Welcome to Aether Core.</div>
+            </div>
+
+        </div>
+    </div>
+
+    <canvas id="gameCanvas" style="display:none;"></canvas>
 
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
         const socket = io(); // Connect to the server
         
+        document.getElementById('login-btn').addEventListener('click', () => {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            console.log("[AUTH] Button clicked!");
+            socket.emit('CMSG_PACKET', {
+                opcode: 'CMSG_AUTH',
+                data: { 
+                    username: username, 
+                    password: password
+                }
+            });
+        });
+
+        let selectedTargetId = null;
+        document.querySelectorAll('.target-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                selectedTargetId = e.target.getAttribute('data-id');
+                document.getElementById('current-target-display').innerText = `Target: ${selectedTargetId}`;
+                logMsg("[TARGET] Selected target:", selectedTargetId);
+                socket.emit('CMSG_PACKET', {
+                    opcode: 'CMSG_SELECT_TARGET',
+                    data: { targetId: selectedTargetId }
+                });
+            });
+
+        socket.on('connect', () => {
+            console.log("%c[NETWORK] Connected to Aether Core!", "color: #0f0; font-weight: bold;");
+            console.log("My Socket ID:", socket.id);
+        });
+
+        socket.on('connect_error', (err) => {
+            console.error("[NETWORK] Connection Error:", err.message);
+        });
+
+        socket.on('SMSG_PACKET', (packet) => {
+            console.log("[NETWORK] Received opcode from server:", packet);
+
+            switch (packet.opcode) {
+                case 'SMSG_SPELL_START':
+                    console.log(`[SPELL] Spell ${packet.data.spellId} started by caster ${packet.data.casterId}`);
+                    break;
+                case 'SMSG_SPELL_GO':
+                    console.log(`[SPELL] Spell ${packet.data.spellId} executed by caster ${packet.data.casterId}`);
+                    break;
+                case 'SMSG_AUTH_RESPONSE':
+                    if (packet.data.success) {
+                        console.log("[AUTH] Login successful! Welcome to Aether Core.");
+                        document.getElementById('screen-login').style.display = 'none';
+                        document.getElementById('screen-char-select').style.display = 'block';
+                        // Start game loop
+                    } else {
+                        console.warn("[AUTH] Login failed:", packet.data.message);
+                        alert("Login failed: " + packet.data.message);
+                    }
+                    break;
+                default:
+                    console.warn("[NETWORK] Unhandled opcode:", packet.opcode);
+            }
+        });
+
         document.addEventListener('keydown', (event) => {
             switch (event.key)
             {
                 case '1':
                     console.log("[CLIENT] Cast Spell: Fireball");
-                    socket.emit('CMSG_CAST_SPELL', { spellId: 101 });
+                    socket.emit('CMSG_PACKET', {
+                        opcode: 'CMSG_CAST_SPELL',
+                        data: { spellId: 101 }
+                    });
                     break;
                 default:
                     return;

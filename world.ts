@@ -1,32 +1,43 @@
-export interface Player {
-    id: string;
-    x: number;
-    y: number;
-    color: string;
-}
+import { Socket } from 'socket.io';
+import { Player } from './Player';
+import { Unit } from './Unit';
 
 export class World {
     private players: Record<string, Player> = {};
+    private units: Map<string, Unit> = new Map();
 
-    addPlayer(id: string): void {
-        this.players[id] = {
-            id: id,
-            // Random start pos
-            x: Math.floor(Math.random() * 500),
-            y: Math.floor(Math.random() * 500),
-            color: '#' + Math.floor(Math.random() * 16777215).toString(16)
-        };
+    addUnit(unit: Unit) {
+        
+    }
 
+    addPlayer(socket: Socket): void {
+        const id = socket.id;
+        const newPlayer = new Player(socket);
+        this.players[id] = newPlayer;
+        this.units.set(socket.id, newPlayer);
         console.log(`[WORLD] Added player ${id}`);
     }
 
-    removePlayer(id: string): void {
+    removePlayer(socket: Socket): void {
+        const id = socket.id;
         delete this.players[id];
         console.log(`[WORLD] Removed player ${id}`);
+        this.units.delete(socket.id);
+    }
+
+    Update(dt: number){
+        this.units.forEach((unit) => {
+            unit.Update(dt);
+        });
     }
 
     // Get the current state to send to clients
-    getPLayers(): Record<string, Player> {
+    getPlayers(): Record<string, Player> {
         return this.players;
+    }
+
+    getPlayerBySocket(socket: Socket): Player | null {
+        const id = socket.id;
+        return this.players[id] || null;
     }
 }
