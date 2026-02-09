@@ -32,8 +32,8 @@ export class OpcodeHandler {
 
     private handleSelectTarget(socket: Socket, world: World, data: any) {
         console.log(`[OPCODE] Handling target selection from socket ${socket.id} with data:`, data);
-        const target = World.units.get(data.targetGuid);
-        if (!target) {
+        //const target = World.units.get(data.targetGuid);
+        /*if (!target) {
             console.warn(`[TARGET] Target with GUID ${data.targetGuid} not found.`);
             return;
         }
@@ -43,7 +43,7 @@ export class OpcodeHandler {
             return;
         }
         // For simplicity, we just log the target selection. In a real implementation, you'd set the player's target.
-        console.log(`[TARGET] Player ${player.guid} selected target ${target.guid}`);
+        console.log(`[TARGET] Player ${player.guid} selected target ${target.guid}`);*/
     }
 
     private handleAuth(socket: Socket, world: World, data: any) {
