@@ -65,12 +65,13 @@ export class Unit {
         }
 
         // Update spells
-        this._spellList.forEach((spell, index) => {
+        for (let i = this._spellList.length - 1; i >= 0; i--) {
+            const spell = this._spellList[i];
             spell.Update(dt);
             if (spell.IsFinished()) {
-                this._spellList.splice(index, 1);
+                this._spellList.splice(i, 1);
             }
-        });
+        }
 
     }
 }

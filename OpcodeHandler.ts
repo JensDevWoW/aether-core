@@ -81,6 +81,7 @@ export class OpcodeHandler {
         }
         console.log(`[OPCODE] Handling spell cast from player ${player.socket.id} with data:`, data);
         const spell = new Spell(data.spellId, player);
+        player.AddSpellToList(spell);
         spell.prepare();
     }
 

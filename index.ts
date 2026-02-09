@@ -47,4 +47,4 @@ setInterval(() => {
 
     // Update World
     world.Update(dt);
-})
+}, TICK_RATE);

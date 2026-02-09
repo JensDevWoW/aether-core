@@ -22,7 +22,7 @@ export class Spell {
     }
     private isPreparing: boolean = false;
     private m_spellState: SpellState = SpellState.NONE;
-    private m_timer: number = 1.5;
+    private m_timer: number = 1500;
     private m_initialSpellTime: number = 0;
     private m_spellTime: number = 1;
     prepare() {
@@ -65,7 +65,7 @@ export class Spell {
                 targetId: this.target ? this.target.guid : null,
                 spellId: this.spellId,
                 timer: 1500, // Placeholder cast time in ms
-                gcd: this.caster.IsPlayer() ? (this.caster as Player).IsOnGCD() : 1500,
+                gcd: this.caster.IsPlayer() ? ((this.caster as Player).IsOnGCD() ? 1500 : 0) : 0,
                 animation: true, // Placeholder for whether to play cast animation
                 isQueued: false, // Placeholder for whether this spell is queued behind another
                 // position: { x: this.caster.x, y: this.caster.y }, // Placeholder for caster position
@@ -90,7 +90,7 @@ export class Spell {
                 targetId: this.target ? this.target.guid : null,
                 spellId: this.spellId,
                 timer: 1500, // Placeholder cast time in ms
-                gcd: this.caster.IsPlayer() ? (this.caster as Player).IsOnGCD() : 1500,
+                gcd: this.caster.IsPlayer() ? ((this.caster as Player).IsOnGCD() ? 1500 : 0) : 0,
                 animation: true, // Placeholder for whether to play cast animation
                 isQueued: false, // Placeholder for whether this spell is queued behind another
                 // position: { x: this.caster.x, y: this.caster.y }, // Placeholder for caster position
@@ -139,8 +139,9 @@ export class Spell {
         // Check if caster is alive
 
         this.SendSpellGoPacket();
-        
-        this.m_spellState = SpellState.CASTING;
+
+        // For now, treat spells as instant completion after "cast" resolves.
+        this.SetFinished();
 
         // this.HandleEffects();
         // Handle spell effects and damage application here
