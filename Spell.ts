@@ -25,11 +25,29 @@ export class Spell {
     private m_timer: number = 1500;
     private m_initialSpellTime: number = 0;
     private m_spellTime: number = 1;
+    private isPositive: boolean = false; // Placeholder for whether the spell is a heal or buff
+
+    private resolveTarget() {
+        if (!this.NeedsTarget()) return;
+
+        if (!this.target) {
+            if (this.isPositive) {
+                this.target = this.caster;
+            }
+            return;
+        }
+
+        if (this.isPositive && this.caster.IsHostileTo(this.target)) {
+            this.target = this.caster; // Heals on enemies just target the caster
+        }
+    }
+
     prepare() {
         if (this.isPreparing) return;
         console.log(`[SPELL] Spell ${this.spellId} is being prepared by Unit ${this.caster.guid}`);
-        
-        // NeedsTarget calculation here
+
+        this.resolveTarget();
+
         if (this.caster) {
             this.isPreparing = true;
 
@@ -119,6 +137,12 @@ export class Spell {
         return ""; // Return empty string if cast is valid, otherwise return reason
     }
 
+    NeedsTarget(): boolean {
+        // Placeholder implementation
+        // In a real implementation, this would check the spell's properties to determine if it needs a target
+        return true;
+    }
+
     SetFinished() {
         console.log(`[SPELL] Spell ${this.spellId} cast by Unit ${this.caster.guid} has finished.`);
         this.m_spellState = SpellState.NONE;
@@ -151,7 +175,7 @@ export class Spell {
         if (!this.caster) {
             return;
         }
-
+        console.log(`[SPELL] Spell ${this.spellId} cast by Unit ${this.caster.guid} is now casting.`);
         this.Execute();
     }
 

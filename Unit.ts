@@ -59,6 +59,10 @@ export class Unit {
         return true; // Placeholder implementation
     }
 
+    IsHostileTo(_other: Unit) {
+        return false; // Placeholder implementation
+    }
+
     Update(dt: number){
         if (this._health <= 0){
             this.die();

@@ -39,6 +39,7 @@ export class Player extends Unit {
     }
 
     Update(deltaTime: number) {
+        super.Update(deltaTime);
         if (this.gcdTimer > 0) {
             this.gcdTimer -= deltaTime;
             if (this.gcdTimer < 0) this.gcdTimer = 0;
