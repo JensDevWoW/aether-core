@@ -4,6 +4,7 @@ import { Server, Socket } from 'socket.io';
 import { OpcodeHandler } from './OpcodeHandler';
 import { World } from './World';
 import { setIO } from './SocketManager';
+import { setWorld } from './WorldManager';
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
@@ -11,7 +12,11 @@ setIO(io); // Make io globally accessible
 app.use(express.static('public'));
 
 const world = new World();
+setWorld(world); // Make world globally accessible
 const opcodeHandler = new OpcodeHandler();
+
+// Initialize targets for testing
+world.initTargets();
 
 io.on('connection', (socket: Socket) => {
     console.log(`[SYSTEM] Player Joined: ${socket.id}`);

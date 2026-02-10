@@ -3,11 +3,14 @@ import { Player } from './Player';
 import { Unit } from './Unit';
 
 export class World {
-    private players: Record<string, Player> = {};
-    private units: Map<string, Unit> = new Map();
+    public players: Record<string, Player> = {};
+    public units: Map<string, Unit> = new Map();
 
-    addUnit(unit: Unit) {
-        
+    addUnit(id: string): Unit {
+        const newUnit = new Unit(id, `Unit${id}`, null);
+        this.units.set(id, newUnit);
+        console.log(`[WORLD] Added unit ${id}`);
+        return newUnit;
     }
 
     addPlayer(socket: Socket): void {
@@ -39,5 +42,11 @@ export class World {
     getPlayerBySocket(socket: Socket): Player | null {
         const id = socket.id;
         return this.players[id] || null;
+    }
+
+    initTargets() {
+        const target1 = this.addUnit('target1');
+        const target2 = this.addUnit('target2');
+        console.log(`[WORLD] Initialized targets: ${target1.guid}, ${target2.guid}`);
     }
 }

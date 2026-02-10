@@ -4,7 +4,7 @@ export class Unit {
     constructor(
         public guid: string,
         public name: string,
-        public socket: Socket
+        public socket: Socket | null
     ) {}
     
     private _isPlayer: boolean = false;

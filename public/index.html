@@ -20,6 +20,7 @@
             <button id="login-btn">Enter World</button>
         </div>
 
+        <!--
         <div id="screen-char-select" style="display:none;">
             <h3>Select your Hero</h3>
             <div id="char-list">
@@ -27,13 +28,14 @@
                 <div class="char-card" onclick="selectChar('Mage')">MAGE - Lvl 12</div>
             </div>
         </div>
+        -->
 
         <div id="game-hud" style="display:none;">
     
             <div id="target-panel">
                 <h3>Select Target:</h3>
-                <button class="target-btn" data-id="target-dummy-1">Dummy 1</button>
-                <button class="target-btn" data-id="target-dummy-2">Dummy 2</button>
+                <button class="target-btn" data-id="target1">Dummy 1</button>
+                <button class="target-btn" data-id="target2">Dummy 2</button>
                 <div id="current-target-display">Target: None</div>
             </div>
 
@@ -113,7 +115,9 @@
                     if (packet.data.success) {
                         console.log("[AUTH] Login successful! Welcome to Aether Core.");
                         document.getElementById('screen-login').style.display = 'none';
-                        document.getElementById('screen-char-select').style.display = 'block';
+                        const charSelect = document.getElementById('game-hud');
+                        if (charSelect) charSelect.style.display = 'none';
+                        document.getElementById('game-hud').style.display = 'block';
                         // Start game loop
                     } else {
                         console.warn("[AUTH] Login failed:", packet.data.message);

@@ -1,5 +1,6 @@
 import { Socket } from "socket.io";
-import { World} from "./World";
+import { world } from "./WorldManager";
+import { World } from "./World";
 import { Spell } from "./Spell";
 
 export interface Packet {
@@ -32,9 +33,9 @@ export class OpcodeHandler {
 
     private handleSelectTarget(socket: Socket, world: World, data: any) {
         console.log(`[OPCODE] Handling target selection from socket ${socket.id} with data:`, data);
-        //const target = World.units.get(data.targetGuid);
-        /*if (!target) {
-            console.warn(`[TARGET] Target with GUID ${data.targetGuid} not found.`);
+        const target = world.units.get(data.targetId);
+        if (!target) {
+            console.warn(`[TARGET] Target with GUID ${data.targetId} not found.`);
             return;
         }
         const player = world.getPlayerBySocket(socket);
@@ -42,8 +43,10 @@ export class OpcodeHandler {
             console.warn(`[TARGET] Player not found for socket ${socket.id}`);
             return;
         }
+
+        player.SetTargetByGuid(data.targetId);
         // For simplicity, we just log the target selection. In a real implementation, you'd set the player's target.
-        console.log(`[TARGET] Player ${player.guid} selected target ${target.guid}`);*/
+        console.log(`[TARGET] Player ${player.guid} selected target ${target.guid}`);
     }
 
     private handleAuth(socket: Socket, world: World, data: any) {
